@@ -42,7 +42,7 @@ repos:
       name: add_inits
       language: system
       entry: bash -c \
-        "for DIR in $(find \"./core\" -type d); do
+        "for DIR in $(find \"./backend\" -type d); do
           touch $DIR/__init__.py;
         done"
 
