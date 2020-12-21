@@ -20,6 +20,7 @@ Jinja2 = "==2.10.1"
 psycopg2-binary = "*"
 
 [dev-packages]
+jupyter = "*"
 
 [requires]
 python_version = "3.8"

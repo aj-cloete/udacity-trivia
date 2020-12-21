@@ -36,4 +36,14 @@ repos:
   hooks:
   - id: flake8
 
+- repo: local
+  hooks:
+    - id: add inits
+      name: add_inits
+      language: system
+      entry: bash -c \
+        "for DIR in $(find \"./core\" -type d); do
+          touch $DIR/__init__.py;
+        done"
+
 default_stages: [commit]
