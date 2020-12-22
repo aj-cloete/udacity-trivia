@@ -3,8 +3,8 @@ import random
 
 from flask import Flask, abort, jsonify, request
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
-from models import Category, Question, setup_db
+from pathlib import Path
+from backend.models import Category, Question, setup_db
 
 QUESTIONS_PER_PAGE = 10
 
@@ -12,21 +12,46 @@ QUESTIONS_PER_PAGE = 10
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
+
+    if test_config is None:
+        # load the instance config, if it exists, when not testing
+        app.config.from_pyfile((Path(__name__).absolute().parent / 'config.py'))
+    else:
+        # load the test config if passed in
+        app.config.from_mapping(test_config)
+
     setup_db(app)
+    cors = CORS(app, origins="*")
 
-    """
-  @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-  """
+    @app.after_request
+    def after_request(response):
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        response.headers.add("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
+        return response
 
-    """
-  @TODO: Use the after_request decorator to set Access-Control-Allow
-  """
+    @app.route("/")
+    def hello():
+        return jsonify({'message': 'hello world'})
 
-    """
-  @TODO:
-  Create an endpoint to handle GET requests
-  for all available categories.
-  """
+    @app.route("/categories")
+    def get_categories():
+        data = Category.query.all()
+        return jsonify([cat.format() for cat in data])
+
+    @app.route("/questions")
+    def get_questions():
+        q = Question.query
+        paged = q.paginate(page=None, per_page=QUESTIONS_PER_PAGE, error_out=True, max_per_page=QUESTIONS_PER_PAGE)
+        try:
+            return jsonify({
+                "categories": [category.format()['type'] for category in Category.query.all()],
+                "total_questions": q.count(),
+                "questions": [quest.format() for quest in paged.items]
+            })
+        except AttributeError:
+            abort(404)
+
+
 
     """
   @TODO:
@@ -72,13 +97,25 @@ def create_app(test_config=None):
   """
 
     """
-  @TODO:
-  Create a GET endpoint to get questions based on category.
-
-  TEST: In the "List" tab / main screen, clicking on one of the
-  categories in the left column will cause only questions of that
-  category to be shown.
-  """
+    @TODO:
+    Create a GET endpoint to get questions based on category.
+    
+    TEST: In the "List" tab / main screen, clicking on one of the
+    categories in the left column will cause only questions of that
+    category to be shown.
+    """
+    # @app.route("/categories/<id:int>/questions")
+    # def category_questions(id):
+    #     q = Question.query.join(Category).filter(Category.id == id)
+    #     paged = q.paginate(page=None, per_page=QUESTIONS_PER_PAGE, error_out=True, max_per_page=QUESTIONS_PER_PAGE)
+    #     try:
+    #         return jsonify({
+    #             "questions": [quest.format() for quest in paged.items],
+    #             "total_questions": q.count(),
+    #             "current_category": [category.format()['type'] for category in Category.query.get(id)],
+    #         })
+    #     except AttributeError:
+    #         abort(404)
 
     """
   @TODO:
