@@ -10,6 +10,6 @@ DEBUG = True
 # Connect to the database
 
 SQLALCHEMY_DATABASE_URI = os.environ.get(
-    "DATABASE_URL", "postgresql://fyyurapp:fyyurpassword@localhost:5432/fyyur"
+    "DATABASE_URL", "postgresql://flaskr:trivia-app@localhost:5432/trivia"
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = True

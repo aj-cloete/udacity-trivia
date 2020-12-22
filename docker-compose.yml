@@ -5,6 +5,6 @@ services:
         ports:
           - "5432:5432"
         environment:
-          - POSTGRES_DB=fyyur
-          - POSTGRES_USER=fyyurapp
-          - POSTGRES_PASSWORD=fyyurpassword
+          - POSTGRES_DB=trivia
+          - POSTGRES_USER=flaskr
+          - POSTGRES_PASSWORD=trivia-app
