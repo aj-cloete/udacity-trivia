@@ -4,23 +4,28 @@
 
 ### Installing Dependencies
 
-#### Python 3.7
+#### Python 3.8
 
 Follow instructions to install the latest version of python for your platform in the [python docs](https://docs.python.org/3/using/unix.html#getting-and-installing-the-latest-version-of-python)
 
 #### Virtual Enviornment
 
-We recommend working within a virtual environment whenever using Python for projects. This keeps your dependencies for each project separate and organaized. Instructions for setting up a virual enviornment for your platform can be found in the [python docs](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
+We recommend using [`pipenv`](https://pipenv-fork.readthedocs.io/en/latest/) to set up a virtual environment whenever using Python for projects. This keeps your dependencies for each project separate and organaized. Instructions for setting up a virual enviornment using [`pipenv`](https://pipenv-fork.readthedocs.io/en/latest/) for your platform can be found in the [python docs](https://packaging.python.org/tutorials/managing-dependencies/?highlight=pipenv)
 
-#### PIP Dependencies
+#### Pipenv Install & shell
 
-Once you have your virtual environment setup and running, install dependencies by naviging to the `/backend` directory and running:
+Once you have your pipenv set up and running, follow along these steps to stand up the environment:
+From the root of this repo, i.e. [here](../.), run the command:
 
 ```bash
-pip install -r requirements.txt
+pipenv sync --dev && pipenv shell
 ```
 
-This will install all of the required packages we selected within the `requirements.txt` file.
+This will use the [Pipfile](../Pipfile) and [Pipfile.lock](../Pipfile.lock) to install all the dependencies and subdependencies.
+
+If you need to install additional packages, use `pipenv install [package]` and if you need to introduce more dev packages, you add the flag `--dev`, i.e. `pipenv install --dev [package]`
+
+> Note: there is no `requirements.txt` file, as this is an old and buggy way of specifying dependencies.  To see why,  [read up on it here.](https://realpython.com/pipenv-guide/#dependency-management-with-requirementstxt)
 
 ##### Key Dependencies
 
@@ -33,17 +38,21 @@ This will install all of the required packages we selected within the `requireme
 ## Database Setup
 With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
 ```bash
-psql trivia < trivia.psql
+psql $DATABASE_URL < backend/trivia.psql
 ```
+
+> Note: if you've changed the database credentials from the default in this repo,
+> you will need to find and replace the user (`flaskr`) with whatever your new user
+> is in the [`backend/trivia.psql`](backend/trivia.psql) file.
 
 ## Running the server
 
-From within the `backend` directory first ensure you are working using your created virtual environment.
+From within the [root](../.) folder, first ensure your environment is active (`pipenv shell`).
 
 To run the server, execute:
 
 ```bash
-export FLASK_APP=flaskr
+export FLASK_APP=backend/flaskr
 export FLASK_ENV=development
 flask run
 ```
