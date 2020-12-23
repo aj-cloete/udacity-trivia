@@ -1,5 +1,5 @@
-import os
-import random
+import os  # noqa
+import random  # noqa
 from pathlib import Path
 
 from flask import Flask, abort, jsonify, request
@@ -22,7 +22,7 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
 
     setup_db(app)
-    cors = CORS(app, origins="*")
+    cors = CORS(app, resources={r"/*": {"origins": "*"}})  # noqa
 
     @app.after_request
     def after_request(response):
@@ -41,13 +41,18 @@ def create_app(test_config=None):
     @app.route("/categories")
     def get_categories():
         data = Category.query.all()
-        return jsonify([cat.format() for cat in data])
+        return jsonify(
+            {
+                "status_code": 200,
+                "message": "success",
+                "categories": [cat.format()["type"] for cat in data],
+            }
+        )
 
     @app.route("/questions")
     def get_questions():
         q = Question.query
         paged = q.paginate(
-            page=None,
             per_page=QUESTIONS_PER_PAGE,
             error_out=True,
             max_per_page=QUESTIONS_PER_PAGE,
@@ -55,96 +60,131 @@ def create_app(test_config=None):
         try:
             return jsonify(
                 {
+                    "status_code": 200,
+                    "message": "success",
                     "categories": [
                         category.format()["type"] for category in Category.query.all()
                     ],
                     "total_questions": q.count(),
                     "questions": [quest.format() for quest in paged.items],
+                    "current_category": "All",
                 }
             )
         except AttributeError:
             abort(404)
 
     """
-  @TODO:
-  Create an endpoint to handle GET requests for questions,
-  including pagination (every 10 questions).
-  This endpoint should return a list of questions,
-  number of total questions, current category, categories.
+    TEST: At this point, when you start the application
+    you should see questions and categories generated,
+    ten questions per page and pagination at the bottom of the screen for three pages.
+    Clicking on the page numbers should update the questions.
+    """
 
-  TEST: At this point, when you start the application
-  you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions.
-  """
+    @app.route("/questions/<int:id>", methods=["DELETE"])
+    def delete_question(id):
+        try:
+            question_to_delete = Question.query.get(id)
+            question_to_delete.delete()
+            return jsonify(
+                {
+                    "status_code": 200,
+                    "message": f"successfully deleted question with id {id}",
+                }
+            )
+        except AttributeError:
+            abort(404)
 
     """
-  @TODO:
-  Create an endpoint to DELETE question using a question ID.
+    TEST: When you click the trash icon next to a question, the question will be removed.
+    This removal will persist in the database and when you refresh the page.
+    """
 
-  TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page.
-  """
+    @app.route("/questions", methods=["POST"])
+    def post_question():
+        question = Question(
+            question=request.json.get("question"),
+            answer=request.json.get("answer"),
+            difficulty=request.json.get("difficulty"),
+            category=request.json.get("category"),
+        )
+        question.insert()
+        return jsonify(
+            {"status_code": 200, "message": "Successfully added question to database"}
+        )
 
     """
-  @TODO:
-  Create an endpoint to POST a new question,
-  which will require the question and answer text,
-  category, and difficulty score.
+    TEST: When you submit a question on the "Add" tab,
+    the form will clear and the question will appear at the end of the last page
+    of the questions list in the "List" tab.
+    """
 
-  TEST: When you submit a question on the "Add" tab,
-  the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.
-  """
+    @app.route("/questions/search", methods=["POST"])
+    def search_question():
+        search_term = request.json.get("searchTerm")
+        results = Question.query.filter(Question.question.ilike(f"%{search_term}%"))
+        return jsonify(
+            {
+                "status_code": 200,
+                "message": "Successfully added question to database",
+                "questions": [question.format() for question in results.all()],
+                "total_questions": results.count(),
+                "current_category": "All",
+            }
+        )
 
     """
-  @TODO:
-  Create a POST endpoint to get questions based on a search term.
-  It should return any questions for whom the search term
-  is a substring of the question.
+    TEST: Search by any phrase. The questions list will update to include
+    only question that include that string within their question.
+    Try using the word "title" to start.
+    """
 
-  TEST: Search by any phrase. The questions list will update to include
-  only question that include that string within their question.
-  Try using the word "title" to start.
-  """
+    @app.route("/categories/<int:id>/questions")
+    def category_questions(id):
+        q = Question.query.filter_by(category=id)
+        paged = q.paginate(
+            page=None,
+            per_page=QUESTIONS_PER_PAGE,
+            error_out=True,
+            max_per_page=QUESTIONS_PER_PAGE,
+        )
+        try:
+            category = Category.query.get(id)
+            return jsonify(
+                {
+                    "status_code": 200,
+                    "message": "Successfully added question to database",
+                    "questions": [quest.format() for quest in paged.items],
+                    "total_questions": q.count(),
+                    "current_category": category.format()["type"]
+                    if category
+                    else "All",
+                }
+            )
+        except AttributeError:
+            abort(404)
 
     """
-    @TODO:
-    Create a GET endpoint to get questions based on category.
-
     TEST: In the "List" tab / main screen, clicking on one of the
     categories in the left column will cause only questions of that
     category to be shown.
     """
-    # @app.route("/categories/<id:int>/questions")
-    # def category_questions(id):
-    #     q = Question.query.join(Category).filter(Category.id == id)
-    #     paged = q.paginate(page=None, per_page=QUESTIONS_PER_PAGE, error_out=True, max_per_page=QUESTIONS_PER_PAGE)
-    #     try:
-    #         return jsonify({
-    #             "questions": [quest.format() for quest in paged.items],
-    #             "total_questions": q.count(),
-    #             "current_category": [category.format()['type'] for category in Category.query.get(id)],
-    #         })
-    #     except AttributeError:
-    #         abort(404)
 
     """
-  @TODO:
-  Create a POST endpoint to get questions to play the quiz.
-  This endpoint should take category and previous question parameters
-  and return a random questions within the given category,
-  if provided, and that is not one of the previous questions.
+    @TODO:
+    Create a POST endpoint to get questions to play the quiz.
+    This endpoint should take category and previous question parameters
+    and return a random questions within the given category,
+    if provided, and that is not one of the previous questions.
 
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not.
-  """
+    TEST: In the "Play" tab, after a user selects "All" or a category,
+    one question at a time is displayed, the user is allowed to answer
+    and shown whether they were correct or not.
+    """
 
     """
-  @TODO:
-  Create error handlers for all expected errors
-  including 404 and 422.
-  """
+    @TODO:
+    Create error handlers for all expected errors
+    including 404 and 422.
+    """
 
     return app
