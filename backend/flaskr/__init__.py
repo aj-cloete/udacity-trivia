@@ -10,7 +10,7 @@ from backend.models import Category, Question, setup_db
 QUESTIONS_PER_PAGE = 10
 
 
-def create_app(test_config=None):
+def create_app(test_config=None):  # noqa
     # create and configure the app
     app = Flask(__name__)
 
@@ -45,7 +45,7 @@ def create_app(test_config=None):
             {
                 "status_code": 200,
                 "message": "success",
-                "categories": [cat.format()["type"] for cat in data],
+                "categories": [cat.format() for cat in data],
             }
         )
 
@@ -62,9 +62,7 @@ def create_app(test_config=None):
                 {
                     "status_code": 200,
                     "message": "success",
-                    "categories": [
-                        category.format()["type"] for category in Category.query.all()
-                    ],
+                    "categories": [cat.format() for cat in Category.query.all()],
                     "total_questions": q.count(),
                     "questions": [quest.format() for quest in paged.items],
                     "current_category": "All",
@@ -140,9 +138,10 @@ def create_app(test_config=None):
 
     @app.route("/categories/<int:id>/questions")
     def category_questions(id):
-        q = Question.query.filter_by(category=id)
+        q = Question.query
+        if id != 0:
+            q = q.filter_by(category=id)
         paged = q.paginate(
-            page=None,
             per_page=QUESTIONS_PER_PAGE,
             error_out=True,
             max_per_page=QUESTIONS_PER_PAGE,
@@ -169,13 +168,18 @@ def create_app(test_config=None):
     category to be shown.
     """
 
-    """
-    @TODO:
-    Create a POST endpoint to get questions to play the quiz.
-    This endpoint should take category and previous question parameters
-    and return a random questions within the given category,
-    if provided, and that is not one of the previous questions.
+    @app.route("/quizzes/<int:id>", methods=["POST"])
+    def quiz_questions(id):
+        r_json = request.json
+        previous_questions = r_json.get("previous_questions")
+        cat_questions = category_questions(id).json.get("questions")
+        eligible_qs = [q for q in cat_questions if q["id"] not in previous_questions]
+        question = None
+        if eligible_qs:
+            question = random.sample(eligible_qs, k=1)[0]
+        return jsonify({"status_code": 200, "message": "success", "question": question})
 
+    """
     TEST: In the "Play" tab, after a user selects "All" or a category,
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.

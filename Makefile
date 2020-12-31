@@ -13,8 +13,6 @@ db:
 	docker-compose up -d postgres
 	sleep 5
 	psql "${DATABASE_URL}" < backend/trivia.psql
-	docker-compoase
-
 
 .PHONY: frontend
 frontend:
