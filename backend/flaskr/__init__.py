@@ -17,11 +17,11 @@ def create_app(test_config=None):  # noqa
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile(Path(__name__).absolute().parent / "config.py")
+        setup_db(app)
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
 
-    setup_db(app)
     cors = CORS(app, resources={r"/*": {"origins": "*"}})  # noqa
 
     @app.after_request
@@ -107,7 +107,11 @@ def create_app(test_config=None):  # noqa
         )
         question.insert()
         return jsonify(
-            {"status_code": 200, "message": "Successfully added question to database"}
+            {
+                "status_code": 200,
+                "message": "Successfully added question to database",
+                "data": question.format(),
+            }
         )
 
     """
@@ -140,7 +144,7 @@ def create_app(test_config=None):  # noqa
     def category_questions(id):
         q = Question.query
         if id != 0:
-            q = q.filter_by(category=id)
+            q = q.filter_by(category=str(id))
         paged = q.paginate(
             per_page=QUESTIONS_PER_PAGE,
             error_out=True,
@@ -185,10 +189,30 @@ def create_app(test_config=None):  # noqa
     and shown whether they were correct or not.
     """
 
-    """
-    @TODO:
-    Create error handlers for all expected errors
-    including 404 and 422.
-    """
+    @app.errorhandler(404)
+    def not_found(error):
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": 404,
+                    "message": "The record you requested was not found",
+                }
+            ),
+            404,
+        )
+
+    @app.errorhandler(422)
+    def not_processable(error):
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": 422,
+                    "message": "Your request is not processable",
+                }
+            ),
+            422,
+        )
 
     return app
