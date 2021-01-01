@@ -24,11 +24,6 @@ class TriviaTestCase(unittest.TestCase):
         self.db.drop_all()
         self.app_context.pop()
 
-    """
-    TODO
-    Write at least one test for each endpoint for successful operation and for expected errors.
-    """
-
 
 class TestHome(TriviaTestCase):
     def test_home(self):
