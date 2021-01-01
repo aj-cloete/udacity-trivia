@@ -20,16 +20,18 @@ and seeing who's the most knowledgeable of the bunch. The application will:
 ## About the repo
 
 This repo contains both the backend and the frontend for the app.
+For **installation instructions** and **further documentation**, see the relevant links below.
 
 ### Backend
 
-The [`./backend`](./backend) directory contains a Flask and SQLAlchemy server. It defines your endpoints and can reference models.py for DB and SQLAlchemy setup.
+The [`./backend`](./backend) directory contains a Flask and SQLAlchemy server.
+It defines your endpoints and can reference [models.py](./backend/models.py) for DB and SQLAlchemy setup.
 
 [View the README.md within ./backend for more details.](./backend/README.md)
 
 ### Frontend
 
 The [`./frontend`](./frontend) directory contains a complete React frontend to consume the data from the Flask server.
-It utilises the backend endpoints/API.
+It utilises the [backend](./backend) endpoints/API.
 
 [View the README.md within ./frontend for more details.](./frontend/README.md)
