@@ -1,8 +1,8 @@
-import json
 import os
 
+from flask import g
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import Column, Integer, String
 
 db = SQLAlchemy()
 
@@ -19,6 +19,11 @@ def setup_db(app, database_path=None):
     db.app = app
     db.init_app(app)
     db.create_all()
+    g.db = db
+
+
+def get_db():
+    return g.db
 
 
 """
