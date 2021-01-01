@@ -21,3 +21,8 @@ frontend:
 .PHONY: backend
 backend:
 	@-flask run
+
+.PHONY: test_db
+test_db:
+	@-make down
+	docker-compose up test_pg
