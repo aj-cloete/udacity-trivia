@@ -44,4 +44,38 @@ Some notable commands:
 - `make backend`: makes the backend
 - `make db`: makes the database (assuming you're using docker)
 - `make down`: brings down everything
-- `make test_db`: brings up the test databse (assuming you're using docker)
+- `make test_db`: brings up the test database (assuming you're using docker)
+
+> These commands must be run from [here](.), not in [backend](./backend) nor in [frontend](./frontend) folders
+
+If you are not able to use the `make` commands, please ensure you're in the [udacity-trivia](.) folder.  Then use the following commands:
+- **backend**: `flask run`
+- **frontend**: `npm start --prefix frontend`
+- **database**: provided you're using docker:
+  - app database: `docker-compose down && docker-compose up postgres`
+  - test database: `docker-compose down && docker-compose up test_pg`
+
+If you're not using docker, ensure that you have configured the databases correctly.
+Details can be found in the [config.py](config.py) file for the application database
+and in [backend/test_flaskr.py](./backend/test_flaskr.py) file for the test database.
+> Notice the port number `54321` configured for the test database.
+
+## Troubleshooting
+### The config.py file is missing
+If you are seeing an error relating to the `config.py` file being missing,
+you're likely trying to run the server from the `backend` folder instead of
+the `udacity-trivia` folder.  Make sure your working directory is [here](.).
+
+### ModuleNotFoundError: No module named 'backend'
+You're likely trying to run the tests from the `backend` folder instead of
+the `udacity-trivia` folder.  Make sure your working directory is [here](.).
+
+### flask.cli.NoAppException: Could not import "flaskr"
+You're likely trying to run the server from the `backend` folder instead of
+the `udacity-trivia` folder.  Make sure your working directory is [here](.).
+
+### sqlalchemy.exc.OperationalError: (psycopg2.OperationalError) could not connect to server: Connection refused
+You probably forgot to run/set up the application database.
+
+### All unittests are failing
+You probably forgot to run/set up the test database.

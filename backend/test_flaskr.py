@@ -1,7 +1,7 @@
 import unittest
 
 from backend.flaskr import create_app
-from backend.models import get_db, setup_db
+from backend.models import db, setup_db
 
 
 class TriviaTestCase(unittest.TestCase):
@@ -16,7 +16,7 @@ class TriviaTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         setup_db(self.app)
-        self.db = get_db()
+        self.db = db
 
     def tearDown(self):
         """Executed after each test"""
