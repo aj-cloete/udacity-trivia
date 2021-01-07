@@ -35,3 +35,13 @@ The [`./frontend`](./frontend) directory contains a complete React frontend to c
 It utilises the [backend](./backend) endpoints/API.
 
 [View the README.md within ./frontend for more details.](./frontend/README.md)
+
+## Running
+
+There is a [Makefile](./Makefile) present which you can use to interact with the frontend and backend.
+Some notable commands:
+- `make frontend`: makes the frontend
+- `make backend`: makes the backend
+- `make db`: makes the database (assuming you're using docker)
+- `make down`: brings down everything
+- `make test_db`: brings up the test databse (assuming you're using docker)

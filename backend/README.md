@@ -61,40 +61,83 @@ Setting the `FLASK_ENV` variable to `development` will detect file changes and r
 
 Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` directory and the `__init__.py` file to find the application.
 
-## Tasks
+## API Reference
 
-One note before you delve into your tasks: for each endpoint you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior.
+### Endpoints
+All endpoints return a JSON object with at least "status_code" and "message" as keys:
+- status_code: The HTTP response code, for example `200`
+- message: a message with information about the response
+- success: a boolean indicating success
 
-1. Use Flask-CORS to enable cross-domain requests and set response headers.
-2. Create an endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories.
-3. Create an endpoint to handle GET requests for all available categories.
-4. Create an endpoint to DELETE question using a question ID.
-5. Create an endpoint to POST a new question, which will require the question and answer text, category, and difficulty score.
-6. Create a POST endpoint to get questions based on category.
-7. Create a POST endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question.
-8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions.
-9. Create error handlers for all expected errors including 400, 404, 422 and 500.
+The endpoints documentation below will not mention these, though they are always present.
 
-REVIEW_COMMENT
-```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code.
+#### GET
 
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
+- GET `/`
+  - welcome message
 
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs.
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
+
+- GET `/categories`
+  - Fetches all defined categories
+  - Request Arguments: None
+  - Returns: An object with a key, "categories", which is an array of objects with two keys: "id" and "type"
+    - id: the id of the category in the database
+    - type: the category type, a text name
+    > {'categories': [{'id': 1, 'type': 'Science'}, {'id': 2, 'type': 'Art'}, {'id': 3, 'type': 'Geography'}, {'id': 4, 'type': 'History'}, {'id': 5, 'type': 'Entertainment'}, {'id': 6, 'type': 'Sports'}], }
+
+
+- GET `/questions`
+  - Fetches all questions in the database (paged)
+  - Request Arguments: None
+  - Returns: Object including the following keys:
+    - categories (see above for details)
+    - total_questions: the number of questions in the database
+    - questions: an array of question objects
+    - current_category: 'All', all questions
+
+
+- GET `/categories/<int:id>/questions`
+  - Fetches all questions belonging to a specific category (paged)
+  - Request Argments: None
+  - Returns: Object including the following keys:
+    - questions: an array of questions from the category
+    - total_questions: number (int) of matching questions
+    - current_category: the requested category type (text)
+
+#### POST
+- POST `/questions`
+  - Writes the question to the database
+  - Request Arguments:
+    The payload should be a JSON with keys:
+    - `question`: The question in text
+    - `answer`: The answer in text
+    - `difficulty`: The difficulty on a scale of 1 to 5 where 1 is easy and 5 is hard
+    - `category`: The id (int) of the category to which this question should belong
+  - Returns: Object with key "data" which shows the posted question as it is in the database.
+
+
+- POST `questions/search`
+  - Searches the questions for the searchTerm and returns any matching questions
+  - Request Arguments:
+    There should be a search term included in your POST, i.e. `/questions?searchTerm=thing`
+    - `searchTerm`: the term that should be searched
+  - Returns:
+    - `questions`: an array of questions matching the search term
+    - `total_questions`: an integer reflecting the number of question matches to the search term
+    - `current_category`: the category (text) within which the search happens
+
+- POST `quizzes/<int:id>`
+  - Fetches a random question from the category associated with id (int)
+  - Request Arguments:
+    - `previous_questions`: an array of ids of questions already asked
+  - Returns:
+    - `question`: the question object fetched
+
+#### DELETE
+- DELETE `/questions/<int:id>`
+  - Deletes the specific question with that id from the database
+
+
 
 ```
 
