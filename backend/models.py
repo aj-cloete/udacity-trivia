@@ -18,8 +18,9 @@ def setup_db(app, database_path=None):
     )
     db.app = app
     db.init_app(app)
-    db.create_all()
-    g.db = db
+    with app.app_context():
+        db.create_all()
+        g.db = db
 
 
 def get_db():
