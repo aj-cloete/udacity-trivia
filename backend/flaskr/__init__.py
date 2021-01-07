@@ -9,6 +9,8 @@ from backend.models import Category, Question, setup_db
 
 QUESTIONS_PER_PAGE = 10
 
+r = dict(status_code=200, message="success", success=True)
+
 
 def create_app(test_config=None):  # noqa
     # create and configure the app
@@ -36,18 +38,12 @@ def create_app(test_config=None):  # noqa
 
     @app.route("/")
     def hello():
-        return jsonify({"message": "hello world"})
+        return jsonify(dict(r, message="hello world"))
 
     @app.route("/categories")
     def get_categories():
         data = Category.query.all()
-        return jsonify(
-            {
-                "status_code": 200,
-                "message": "success",
-                "categories": [cat.format() for cat in data],
-            }
-        )
+        return jsonify(dict(r, categories=[cat.format() for cat in data]))
 
     @app.route("/questions")
     def get_questions():
@@ -59,14 +55,13 @@ def create_app(test_config=None):  # noqa
         )
         try:
             return jsonify(
-                {
-                    "status_code": 200,
-                    "message": "success",
-                    "categories": [cat.format() for cat in Category.query.all()],
-                    "total_questions": q.count(),
-                    "questions": [quest.format() for quest in paged.items],
-                    "current_category": "All",
-                }
+                dict(
+                    r,
+                    categories=[cat.format() for cat in Category.query.all()],
+                    total_questions=q.count(),
+                    questions=[quest.format() for quest in paged.items],
+                    current_category="All",
+                )
             )
         except AttributeError:
             abort(404)
@@ -84,10 +79,7 @@ def create_app(test_config=None):  # noqa
             question_to_delete = Question.query.get(id)
             question_to_delete.delete()
             return jsonify(
-                {
-                    "status_code": 200,
-                    "message": f"successfully deleted question with id {id}",
-                }
+                dict(r, message=f"successfully deleted question with id {id}")
             )
         except AttributeError:
             abort(404)
@@ -107,11 +99,11 @@ def create_app(test_config=None):  # noqa
         )
         question.insert()
         return jsonify(
-            {
-                "status_code": 200,
-                "message": "Successfully added question to database",
-                "data": question.format(),
-            }
+            dict(
+                r,
+                message="Successfully added question to database",
+                data=question.format(),
+            )
         )
 
     """
@@ -125,13 +117,13 @@ def create_app(test_config=None):  # noqa
         search_term = request.json.get("searchTerm")
         results = Question.query.filter(Question.question.ilike(f"%{search_term}%"))
         return jsonify(
-            {
-                "status_code": 200,
-                "message": "Successfully added question to database",
-                "questions": [question.format() for question in results.all()],
-                "total_questions": results.count(),
-                "current_category": "All",
-            }
+            dict(
+                r,
+                message="Successfully added question to database",
+                questions=[question.format() for question in results.all()],
+                total_questions=results.count(),
+                current_category="All",
+            )
         )
 
     """
@@ -153,15 +145,13 @@ def create_app(test_config=None):  # noqa
         try:
             category = Category.query.get(id)
             return jsonify(
-                {
-                    "status_code": 200,
-                    "message": "Successfully added question to database",
-                    "questions": [quest.format() for quest in paged.items],
-                    "total_questions": q.count(),
-                    "current_category": category.format()["type"]
-                    if category
-                    else "All",
-                }
+                dict(
+                    r,
+                    message=f"Successfully fetched all questions with category id={id}",
+                    questions=[quest.format() for quest in paged.items],
+                    total_questions=q.count(),
+                    current_category=category.format()["type"] if category else "All",
+                )
             )
         except AttributeError:
             abort(404)
@@ -181,7 +171,7 @@ def create_app(test_config=None):  # noqa
         question = None
         if eligible_qs:
             question = random.sample(eligible_qs, k=1)[0]
-        return jsonify({"status_code": 200, "message": "success", "question": question})
+        return jsonify(dict(r, question=question))
 
     """
     In the "Play" tab, after a user selects "All" or a category,
@@ -189,15 +179,28 @@ def create_app(test_config=None):  # noqa
     and shown whether they were correct or not.
     """
 
+    @app.errorhandler(400)
+    def not_understood(error):
+        return (
+            jsonify(
+                dict(
+                    success=False,
+                    status_code=400,
+                    message="The request could not be understood by the server due to malformed syntax",
+                )
+            ),
+            400,
+        )
+
     @app.errorhandler(404)
     def not_found(error):
         return (
             jsonify(
-                {
-                    "success": False,
-                    "error": 404,
-                    "message": "The record you requested was not found",
-                }
+                dict(
+                    success=False,
+                    status_code=404,
+                    message="The record you requested was not found",
+                )
             ),
             404,
         )
@@ -206,13 +209,27 @@ def create_app(test_config=None):  # noqa
     def not_processable(error):
         return (
             jsonify(
-                {
-                    "success": False,
-                    "error": 422,
-                    "message": "Your request is not processable",
-                }
+                dict(
+                    success=False,
+                    status_code=422,
+                    message="Your request is not processable",
+                )
             ),
             422,
+        )
+
+    @app.errorhandler(500)
+    def server_error(error):
+        return (
+            jsonify(
+                dict(
+                    success=False,
+                    status_code=500,
+                    message="The server encountered an unexpected condition "
+                    "which prevented it from fulfilling the request",
+                )
+            ),
+            500,
         )
 
     return app
