@@ -22,6 +22,11 @@ and seeing who's the most knowledgeable of the bunch. The application will:
 This repo contains both the backend and the frontend for the app.
 For **installation instructions** and **further documentation**, see the relevant links below.
 
+> Please note: the whole repo is managed by `pipenv`.
+> The easiest way to set up the environment is by running `pipenv install --dev` followed by `pipenv shell` to ensure the environment is activated.
+
+More thorough instructions in the [backend README](./backend/README.md)
+
 ### Backend
 
 The [`./backend`](./backend) directory contains a Flask and SQLAlchemy server.
