@@ -90,6 +90,14 @@ Details can be found in the [config.py](config.py) file for the application data
 and in [backend/test_flaskr.py](./backend/test_flaskr.py) file for the test database.
 > Notice the port number `54321` configured for the test database.
 
+## Testing
+To run the tests (again, from the udacity-trivia directory), make sure you have the backend database up and running (see above),
+and that the environment is activated (`pipenv shell`).
+Then simply run:
+```
+python -m unittest
+```
+
 ## Troubleshooting
 ### The config.py file is missing
 If you are seeing an error relating to the `config.py` file being missing,
@@ -110,3 +118,6 @@ You probably forgot to run/set up the application database.
 
 ### All unittests are failing
 You probably forgot to run/set up the test database.
+
+### Error: Cannot find module "...start.js"
+You don't have node installed correctly.  Please follow the installation instructions in the [frontend README](./frontend/README.md).

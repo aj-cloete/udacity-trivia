@@ -47,7 +47,7 @@ psql $DATABASE_URL < backend/trivia.psql
 
 ## Running the server
 
-From within the [root](../.) folder, first ensure your environment is active (`pipenv shell`).
+From within the [udacity-trivia](../.) folder (not udacity-trivia/backend), first ensure your environment is active (`pipenv shell`).
 
 To run the server, execute:
 
@@ -136,17 +136,3 @@ The endpoints documentation below will not mention these, though they are always
 #### DELETE
 - DELETE `/questions/<int:id>`
   - Deletes the specific question with that id from the database
-
-
-
-```
-
-
-## Testing
-To run the tests, run
-```
-dropdb trivia_test
-createdb trivia_test
-psql trivia_test < trivia.psql
-python test_flaskr.py
-```
