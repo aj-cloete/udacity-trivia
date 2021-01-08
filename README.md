@@ -41,6 +41,18 @@ It utilises the [backend](./backend) endpoints/API.
 
 [View the README.md within ./frontend for more details.](./frontend/README.md)
 
+## Installation
+You will need [**pipenv**](https://pipenv-fork.readthedocs.io/en/latest/) to bring up the environment.
+It is recommended by the python community to set up an environment.
+
+1. Clone the repo: `git clone https://github.com/aj-cloete/udacity-trivia.git`
+2. Enter the directory: `cd udacity-trivia`
+3. Set up the environment: `pipenv install --dev`
+4. Activate the environment: `pipenv shell`
+
+> Each process you will be launching needs to be run from within an active environment.
+> This is most easily achieved by navigating to the [**udacity-trivia**](.) directory and running `pipenv shell`
+
 ## Running
 
 There is a [Makefile](./Makefile) present which you can use to interact with the frontend and backend.
@@ -50,17 +62,21 @@ Some notable commands:
 - `make db`: makes the database (assuming you're using docker)
 - `make down`: brings down everything
 - `make test_db`: brings up the test database (assuming you're using docker)
+> These commands must be run from [the udacity-trivia directory](.), not in [backend](./backend) nor in [frontend](./frontend) directory.
 
-> These commands must be run from [here](.), not in [backend](./backend) nor in [frontend](./frontend) folders
-
-If you are not able to use the `make` commands, please ensure you're in the [udacity-trivia](.) folder.  Then use the following commands:
-- **backend**: `flask run`
+If you are not able to use the `make` commands (requires docker for the databases), please ensure you're in the [udacity-trivia](.) folder.  Then use the following commands:
+- **backend**:
+  ```
+  export FLASK_APP=backend/flaskr
+  export FLASK_ENV=development
+  flask run
+  ```
 - **frontend**: `npm start --prefix frontend`
 - **database**: provided you're using docker:
   - app database: `docker-compose down && docker-compose up postgres`
   - test database: `docker-compose down && docker-compose up test_pg`
 
-If you're not using docker, ensure that you have configured the databases correctly.
+If you're not using docker, ensure that you have configured the databases correctly according to your approach of standing up the postgres database.
 Details can be found in the [config.py](config.py) file for the application database
 and in [backend/test_flaskr.py](./backend/test_flaskr.py) file for the test database.
 > Notice the port number `54321` configured for the test database.
@@ -69,7 +85,8 @@ and in [backend/test_flaskr.py](./backend/test_flaskr.py) file for the test data
 ### The config.py file is missing
 If you are seeing an error relating to the `config.py` file being missing,
 you're likely trying to run the server from the `backend` folder instead of
-the `udacity-trivia` folder.  Make sure your working directory is [here](.).
+the `udacity-trivia` folder.  Make sure your working directory is [the udacity-trivia directory](.).
+Also ensure that you have set the $FLASK_APP environment variable to `backend/flaskr`
 
 ### ModuleNotFoundError: No module named 'backend'
 You're likely trying to run the tests from the `backend` folder instead of
