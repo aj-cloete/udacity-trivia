@@ -48,7 +48,16 @@ It is recommended by the python community to set up an environment.
 1. Clone the repo: `git clone https://github.com/aj-cloete/udacity-trivia.git`
 2. Enter the directory: `cd udacity-trivia`
 3. Set up the environment: `pipenv install --dev`
-4. Activate the environment: `pipenv shell`
+4. Specify the environment variables:
+
+   Either create an `.env` file (`touch .env`) with the following content: (pipenv automatically loads the `.env` file when you activate the environment with `pipenv shell`)
+   ```
+   FLASK_APP=backend/flaskr
+   FLASK_ENV=development
+   DATABASE_URL="postgresql://flaskr:trivia-app@localhost:5432/trivia"
+   ```
+   Or export those variables above within the environment.
+5. Activate the environment: `pipenv shell`
 
 > Each process you will be launching needs to be run from within an active environment.
 > This is most easily achieved by navigating to the [**udacity-trivia**](.) directory and running `pipenv shell`
